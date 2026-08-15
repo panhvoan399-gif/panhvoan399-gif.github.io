@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panh Voan Typing</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f1e8;
+    color: #333;
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+    margin: 20px auto;
+    padding: 18px;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(#8b602d, #4d2c12);
+    border-radius: 30px;
+    padding: 12px 18px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px #999;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.name {
+    color: #ffd21c;
+}
+
+/* Stats */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 18px 0;
+}
+
+.stat {
+    background: #40221a;
+    color: white;
+    padding: 12px;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.stat strong {
+    display: block;
+    font-size: 22px;
+    margin-top: 4px;
+    color: #ffd21c;
+}
+
+/* Words */
+.words {
+    background: #303236;
+    color: #ddd;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 20px;
+    line-height: 2;
+    min-height: 130px;
+    word-spacing: 7px;
+}
+
+.words span.correct {
+    color: #55e391;
+}
+
+.words span.wrong {
+    color: #ff667d;
+    background: #52232c;
+}
+
+.words span.current {
+    background: #dce2e8;
+    color: #333;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+/* Input */
+#typingInput {
+    width: 100%;
+    height: 60px;
+    margin-top: 15px;
+    border: 2px solid #6b9c99;
+    border-radius: 12px;
+    background: #bdf4f1;
+    font-size: 18px;
+    text-align: center;
+    outline: none;
+    padding: 10px;
+}
+
+#typingInput:focus {
+    border-color: #159b91;
+}
+
+/* Button */
+button {
+    display: block;
+    margin: 14px auto;
+    border: none;
+    border-radius: 20px;
+    background: #68727b;
+    color: white;
+    padding: 9px 22px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4d5962;
+}
+
+/* Result */
+.result {
+    display: none;
+    text-align: center;
+    background: #fff8df;
+    border: 1px solid #e1b95c;
+    border-radius: 15px;
+    padding: 18px;
+    margin-top: 15px;
+}
+
+.rank {
+    font-size: 28px;
+    font-weight: bold;
+    color: #e09a00;
+    margin: 8px;
+}
+
+/* Leaderboard */
+.leaderboard {
+    background: white;
+    margin-top: 20px;
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid #d2a467;
+}
+
+.leaderboard h2 {
+    margin-top: 0;
+    font-size: 19px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+th {
+    color: #999;
+}
+
+.speed {
+    color: #2782dc;
+    font-weight: bold;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .words {
+        font-size: 17px;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            🏆 Panh Voan Typing
+        </div>
+
+        <div>
+            🇺🇸 English
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+
+        <div class="stat">
+            ⏱️ TIME
+            <strong id="time">60</strong>
+        </div>
+
+        <div class="stat">
+            🚀 WPM
+            <strong id="wpm">0</strong>
+        </div>
+
+        <div class="stat">
+            ❌ ERRORS
+            <strong id="errors">0</strong>
+        </div>
+
+    </div>
+
+    <!-- Words -->
+    <div class="words" id="words"></div>
+
+    <!-- Typing -->
+    <input
+        id="typingInput"
+        type="text"
+        placeholder="Start typing here..."
+        autocomplete="off"
+        spellcheck="false"
+    >
+
+    <button onclick="restartGame()">
+        🔄 Restart
+    </button>
+
+    <!-- Result -->
+    <div class="result" id="result">
+
+        <div>Your Result</div>
+
+        <div class="rank" id="rank">
+            Legendary 🏆
+        </div>
+
+        <div id="resultText"></div>
+
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard">
+
+        <h2>🏆 Leaderboard (80+ WPM)</h2>
+
+        <table>
+
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Speed</th>
+                <th>Time</th>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td>SpeedKing</td>
+                <td class="speed">154 WPM</td>
+                <td>60s</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>FastTyper</td>
+                <td class="speed">142 WPM</td>
+                <td>60s</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>Panh Voan</td>
+                <td class="speed" id="myScore">---</td>
+                <td>60s</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const text =
+"cut help water really state they quickly find left question food below dream even almost help food below dream even almost by write white between really put state went almost water near are work read";
+
+const wordsBox = document.getElementById("words");
+const input = document.getElementById("typingInput");
+
+let started = false;
+let startTime = 0;
+let timer = null;
+let finished = false;
+
+
+/* Show words */
+
+function showWords() {
+
+    wordsBox.innerHTML = "";
+
+    [...text].forEach((letter, index) => {
+
+        const span = document.createElement("span");
+
+        span.textContent = letter;
+
+        if (index === 0) {
+            span.classList.add("current");
+        }
+
+        wordsBox.appendChild(span);
+
+    });
+}
+
+
+/* Update typing */
+
+function updateTyping() {
+
+    const typed = [...input.value];
+
+    const letters = wordsBox.querySelectorAll("span");
+
+    let correct = 0;
+    let errors = 0;
+
+    letters.forEach((span, index) => {
+
+        span.className = "";
+
+        if (index < typed.length) {
+
+            if (typed[index] === text[index]) {
+
+                span.classList.add("correct");
+                correct++;
+
+            } else {
+
+                span.classList.add("wrong");
+                errors++;
+
+            }
+
+        }
+
+        if (index === typed.length && !finished) {
+
+            span.classList.add("current");
+
+        }
+
+    });
+
+
+    const seconds =
+        Math.max((Date.now() - startTime) / 1000, 0.1);
+
+    const minutes = seconds / 60;
+
+    const wpm =
+        Math.round((typed.length / 5) / minutes);
+
+    document.getElementById("wpm").textContent = wpm;
+
+    document.getElementById("errors").textContent = errors;
+
+    document.getElementById("time").textContent =
+        Math.max(
+            0,
+            60 - Math.floor(seconds)
+        );
+
+
+    if (seconds >= 60) {
+
+        finishGame();
+
+    }
+
+
+    if (typed.length >= text.length) {
+
+        finishGame();
+
+    }
+
+}
+
+
+/* Start */
+
+input.addEventListener("input", function () {
+
+    if (!started) {
+
+        started = true;
+
+        startTime = Date.now();
+
+        timer = setInterval(updateTyping, 200);
+
+    }
+
+    updateTyping();
+
+});
+
+
+/* Finish */
+
+function finishGame() {
+
+    if (finished) return;
+
+    finished = true;
+
+    clearInterval(timer);
+
+    input.disabled = true;
+
+    const typed = [...input.value];
+
+    let correct = 0;
+
+    typed.forEach((letter, index) => {
+
+        if (letter === text[index]) {
+
+            correct++;
+
+        }
+
+    });
+
+
+    const errors =
+        typed.length - correct;
+
+    const seconds =
+        Math.max(
+            (Date.now() - startTime) / 1000,
+            1
+        );
+
+    const wpm =
+        Math.round(
+            (typed.length / 5) /
+            (seconds / 60)
+        );
+
+    const accuracy =
+        typed.length === 0
+        ? 0
+        : Math.round(
+            (correct / typed.length) * 100
+        );
+
+
+    let rank;
+
+
+    if (wpm >= 80 && accuracy >= 95) {
+
+        rank = "Legendary 🏆";
+
+    } else if (wpm >= 60 && accuracy >= 90) {
+
+        rank = "Excellent 🔥";
+
+    } else if (wpm >= 40 && accuracy >= 85) {
+
+        rank = "Advanced ⭐";
+
+    } else if (wpm >= 25) {
+
+        rank = "Good 👍";
+
+    } else {
+
+        rank = "Beginner 🌱";
+
+    }
+
+
+    document.getElementById("rank").textContent = rank;
+
+    document.getElementById("resultText").textContent =
+        wpm + " WPM • " +
+        accuracy + "% Accuracy • " +
+        errors + " Errors";
+
+
+    document.getElementById("result").style.display =
+        "block";
+
+
+    document.getElementById("myScore").textContent =
+        wpm + " WPM";
+
+}
+
+
+/* Restart */
+
+function restartGame() {
+
+    clearInterval(timer);
+
+    started = false;
+    finished = false;
+
+    input.disabled = false;
+    input.value = "";
+
+    document.getElementById("time").textContent = "60";
+    document.getElementById("wpm").textContent = "0";
+    document.getElementById("errors").textContent = "0";
+
+    document.getElementById("result").style.display =
+        "none";
+
+    document.getElementById("myScore").textContent =
+        "---";
+
+    showWords();
+
+    input.focus();
+
+}
+
+
+showWords();
+
+</script>
+
+</body>
+</html>
